@@ -29,7 +29,7 @@ class RetrofitNetworkClient(
                         Response().apply { resultCode = Response.INTERNAL_SERVER_ERROR_CODE }
                     } catch (e: IOException) {
                         Log.e("RetrofitNetworkClient", "IO error: ${e.message}", e)
-                        Response().apply { resultCode = Response.INTERNAL_SERVER_ERROR_CODE }
+                        Response().apply { resultCode = Response.NO_INTERNET_ERROR_CODE }
                     }
                 }
             } else {
