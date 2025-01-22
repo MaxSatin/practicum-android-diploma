@@ -8,6 +8,7 @@ import ru.practicum.android.diploma.common.data.Mapper
 import ru.practicum.android.diploma.common.data.dto.Response
 import ru.practicum.android.diploma.common.data.dto.SearchVacancyRequest
 import ru.practicum.android.diploma.common.util.ConnectivityManager
+import java.io.IOException
 
 class RetrofitNetworkClient(
     private val headHunterApi: HeadHunterApi,
@@ -26,9 +27,8 @@ class RetrofitNetworkClient(
                     } catch (e: HttpException) {
                         Log.e("RetrofitNetworkClient", "HTTP error: ${e.message}", e)
                         Response().apply { resultCode = Response.INTERNAL_SERVER_ERROR_CODE }
-                    } catch (e: Exception) {
-                        @Suppress("TooGenericExceptionCaught")
-                        Log.e("RetrofitNetworkClient", "Unexpected error: ${e.message}", e)
+                    } catch (e: IOException) {
+                        Log.e("RetrofitNetworkClient", "IO error: ${e.message}", e)
                         Response().apply { resultCode = Response.INTERNAL_SERVER_ERROR_CODE }
                     }
                 }
