@@ -26,8 +26,7 @@ class RetrofitNetworkClient(
                     } catch (e: HttpException) {
                         Log.e("RetrofitNetworkClient", "HTTP error: ${e.message}", e)
                         Response().apply { resultCode = Response.INTERNAL_SERVER_ERROR_CODE }
-                    }
-                    catch (e: Exception) {
+                    } catch (e: Exception) {
                         Log.e("RetrofitNetworkClient", "Unexpected error: ${e.message}", e)
                         Response().apply { resultCode = Response.INTERNAL_SERVER_ERROR_CODE }
                     }
