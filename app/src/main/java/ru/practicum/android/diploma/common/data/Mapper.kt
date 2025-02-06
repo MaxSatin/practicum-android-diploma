@@ -1,6 +1,10 @@
 package ru.practicum.android.diploma.common.data
 
+import ru.practicum.android.diploma.common.data.dto.CountriesResponse
+import ru.practicum.android.diploma.common.data.dto.IndustriesResponse
 import ru.practicum.android.diploma.common.data.dto.SearchVacancyResponse
+import ru.practicum.android.diploma.filter.data.dto.model.CountryDto
+import ru.practicum.android.diploma.filter.data.dto.model.IndustryDto
 import ru.practicum.android.diploma.search.data.dto.model.AreaDto
 import ru.practicum.android.diploma.search.data.dto.model.EmployerDto
 import ru.practicum.android.diploma.search.data.dto.model.SalaryDto
@@ -19,11 +23,17 @@ class Mapper {
         map["page"] = searchQueryParams.page.toString()
         map["per_page"] = "20"
 
+        searchQueryParams.filter?.let { params ->
+            (params.areaCity?.id ?: params.areaCountry?.id)?.let { map["area"] = it }
+            params.industrySP?.let { map["industry"] = it.id }
+            params.salary?.let { map["salary"] = it.toString() }
+            params.withSalary?.let { map["only_with_salary"] = it.toString() }
+        }
         return map
     }
 
     fun map(response: SearchVacancyResponse): VacancyList {
-        val items: List<VacancyItems> = response.items.map { map(it) }
+        val items: List<VacancyItems> = response.items.map { mapVacancyItems(it) }
         return VacancyList(
             items = items,
             found = response.found ?: 0,
@@ -33,18 +43,18 @@ class Mapper {
         )
     }
 
-    fun map(searchVacancyDto: SearchVacancyDto): VacancyItems {
+    private fun mapVacancyItems(searchVacancyDto: SearchVacancyDto): VacancyItems {
         return VacancyItems(
             id = searchVacancyDto.id,
             name = searchVacancyDto.name,
             employer = searchVacancyDto.employer?.name ?: "",
             areaName = getAreaName(searchVacancyDto.area),
             iconUrl = getEmployerLogo(searchVacancyDto.employer),
-            salary = map(searchVacancyDto.salary),
+            salary = mapSalary(searchVacancyDto.salary),
         )
     }
 
-    fun map(salaryDto: SalaryDto?): Salary? {
+    private fun mapSalary(salaryDto: SalaryDto?): Salary? {
         return salaryDto?.let {
             Salary(
                 from = it.from,
@@ -65,6 +75,18 @@ class Mapper {
                 salary
             )
         }
+    }
+
+    fun map(list: List<IndustryDto>): IndustriesResponse {
+        return IndustriesResponse(
+            result = list
+        )
+    }
+
+    fun map(list: List<CountryDto>): CountriesResponse {
+        return CountriesResponse(
+            result = list
+        )
     }
 
     private fun getAreaName(areaDto: AreaDto?): String = areaDto?.name ?: ""

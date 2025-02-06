@@ -1,0 +1,30 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginHorizontal="@dimen/margin_16dp">
+
+<TextView
+    android:id="@+id/country_or_region"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:paddingVertical="18dp"
+    android:textColor="?attr/colorOnPrimary"
+    app:layout_constraintEnd_toStartOf="@id/button_image"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    tools:text="Название страны"
+    style="@style/BigTextBlack" />
+
+<ImageView
+    android:id="@+id/button_image"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:checked="false"
+    android:gravity="center_vertical"
+    android:src="@drawable/ic_arrow_forward_24px"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

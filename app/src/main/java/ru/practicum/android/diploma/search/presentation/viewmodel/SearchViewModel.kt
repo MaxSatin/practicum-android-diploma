@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.common.data.Mapper
+import ru.practicum.android.diploma.common.sharedprefs.interactor.SharedPrefsInteractor
+import ru.practicum.android.diploma.common.sharedprefs.models.Filter
 import ru.practicum.android.diploma.common.util.Converter
 import ru.practicum.android.diploma.common.util.debounce
 import ru.practicum.android.diploma.search.domain.interactor.SearchInteractor
@@ -18,6 +20,7 @@ import ru.practicum.android.diploma.search.presentation.items.ListItem
 class SearchViewModel(
     private val searchInteractor: SearchInteractor,
     private val mapper: Mapper,
+    private val sharedPrefsInteractor: SharedPrefsInteractor,
 ) : ViewModel() {
 
     private var currentPage: Int = 1
@@ -51,6 +54,9 @@ class SearchViewModel(
     private val stateLiveData = MutableLiveData<SearchViewState>()
     fun observeState(): LiveData<SearchViewState> = stateLiveData
 
+    private val filterStateLiveData = MutableLiveData<Boolean>()
+    fun observeFilterStateLiveData(): LiveData<Boolean> = filterStateLiveData
+
     private val adapterStateLiveData = MutableLiveData<AdapterState>()
     fun getAdapterStateLiveData(): LiveData<AdapterState> = adapterStateLiveData
 
@@ -80,7 +86,7 @@ class SearchViewModel(
                 job = viewModelScope.launch {
                     try {
                         searchInteractor
-                            .searchVacancy(searchQuery, 1)
+                            .searchVacancy(searchQuery, 0)
                             .collect { viewState ->
                                 renderScreenState(viewState)
                                 isNextPageLoading = false
@@ -95,7 +101,7 @@ class SearchViewModel(
     }
 
     fun onLastItemReached(query: String) {
-        if (!(currentPage != maxPages && maxPages != 0) || this.latestSearchQuery != query) {
+        if (!(currentPage != maxPages && maxPages != 0) || !this.latestSearchQuery.equals(query)) {
             return
         } else if (query.isNotEmpty()) {
             if (!isNextPageLoading) {
@@ -105,7 +111,7 @@ class SearchViewModel(
                         isNextPageLoading = true
                         renderAdapterState(AdapterState.IsLoading)
                         searchInteractor
-                            .searchVacancy(query, currentPage)
+                            .searchVacancy(query, currentPage - 1)
                             .collect { viewState ->
                                 renderScreenState(viewState)
                                 isNextPageLoading = false
@@ -139,11 +145,24 @@ class SearchViewModel(
 
     fun clearSearchList() {
         renderScreenState(
-            SearchViewState.Content(
-                emptyVacancyList,
-                null
-            )
+            SearchViewState.Base
         )
+    }
+
+    fun renderFilterState() {
+        val filter = sharedPrefsInteractor.getFilter()
+        Log.d("SearchFilterState", "$filter")
+        if (checkFilterFieldsAreNull(filter) && filter.withSalary != true) {
+            filterStateLiveData.postValue(false)
+        } else {
+            filterStateLiveData.postValue(true)
+        }
+    }
+
+    private fun checkFilterFieldsAreNull(filter: Filter): Boolean {
+        return with(filter) {
+            areaCountry == null && areaCity == null && industrySP == null && salary == null
+        }
     }
 
     private fun renderScreenState(state: SearchViewState) {
@@ -151,9 +170,12 @@ class SearchViewModel(
             this.maxPages = state.vacancyList.pages
             Log.d("NewpageVacancies", "${state.vacancyList.items.size}")
             Log.d("VacanciesFound", "${state.vacancyList.items}")
+
+            val updatedItems = state.vacancyList.items.map { vacancy -> mapper.map(vacancy) }
+
             stateLiveData.postValue(
                 SearchViewState.Content(
-                    state.vacancyList.items.map { vacancy -> mapper.map(vacancy) },
+                    updatedItems,
                     makeFoundVacanciesHint(state.vacancyList.found)
                 )
             )
