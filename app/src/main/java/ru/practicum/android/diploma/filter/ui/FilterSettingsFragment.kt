@@ -48,9 +48,10 @@ class FilterSettingsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        binding.topBar.setOnClickListener { findNavController().navigate(
-            R.id.action_filterSettingsFragment_to_searchFragment
-        ) }
+        binding.topBar.setOnClickListener {
+            //findNavController().navigate(R.id.action_filterSettingsFragment_to_searchFragment)
+            findNavController().navigateUp()
+        }
         binding.workplaceContainer.setOnClickListener { navigateToPlaceOfWorkFragment() }
         binding.industryContainer.setOnClickListener { navigateToIndustryFragment() }
         binding.resetButton.setOnClickListener { resetButtonClickListener() }
@@ -220,6 +221,7 @@ class FilterSettingsFragment : Fragment() {
             viewModel.clearFilterField("withSalary")
         }
 
-        findNavController().navigate(R.id.action_filterSettingsFragment_to_searchFragment)
+        //findNavController().navigate(R.id.action_filterSettingsFragment_to_searchFragment)
+        findNavController().navigateUp()
     }
 }

@@ -41,11 +41,13 @@ class FilterPlaceOfWorkFragment : Fragment() {
         }
 
         binding.topBar.setOnClickListener {
-            findNavController().navigate(R.id.action_filterPlaceOfWorkFragment_to_filterSettingsFragment)
+            //findNavController().navigate(R.id.action_filterPlaceOfWorkFragment_to_filterSettingsFragment)
+            findNavController().navigateUp()
         }
 
         binding.btnSelectPlaceOfWork.setOnClickListener {
-            findNavController().navigate(R.id.action_filterPlaceOfWorkFragment_to_filterSettingsFragment)
+           // findNavController().navigate(R.id.action_filterPlaceOfWorkFragment_to_filterSettingsFragment)
+            findNavController().navigateUp()
         }
 
         binding.frameCountry.setOnClickListener {

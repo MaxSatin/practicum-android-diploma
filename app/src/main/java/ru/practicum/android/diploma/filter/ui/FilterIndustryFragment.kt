@@ -64,7 +64,8 @@ class FilterIndustryFragment : Fragment() {
         textWatcher.let { binding.textInput.addTextChangedListener(it) }
 
         binding.topBar.setOnClickListener {
-            findNavController().navigate(R.id.action_filterIndustryFragment_to_filterSettingsFragment)
+            //findNavController().navigate(R.id.action_filterIndustryFragment_to_filterSettingsFragment)
+            findNavController().navigateUp()
         }
         binding.btnSelectIndustry.setOnClickListener {
             viewModelSettings.updateFilter(
@@ -72,7 +73,8 @@ class FilterIndustryFragment : Fragment() {
                     industrySP = viewModel.getIndustry()
                 )
             )
-            findNavController().navigate(R.id.action_filterIndustryFragment_to_filterSettingsFragment)
+            //findNavController().navigate(R.id.action_filterIndustryFragment_to_filterSettingsFragment)
+            findNavController().navigateUp()
         }
 
         viewModel.observeState().observe(viewLifecycleOwner) {

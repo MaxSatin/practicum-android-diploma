@@ -35,7 +35,8 @@ class FilterCountriesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.topBar.setOnClickListener {
-            findNavController().navigate(R.id.action_filterCountriesFragment_to_filterPlaceOfWorkFragment)
+            //findNavController().navigate(R.id.action_filterCountriesFragment_to_filterPlaceOfWorkFragment)
+            findNavController().navigateUp()
         }
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvCountryRegionItems)
 
@@ -48,7 +49,8 @@ class FilterCountriesFragment : Fragment() {
                 }
                 is CountryViewState.CountrySelected -> {
                     viewModel.saveCountry(state.country)
-                    findNavController().navigate(R.id.action_filterCountriesFragment_to_filterPlaceOfWorkFragment)
+                    //findNavController().navigate(R.id.action_filterCountriesFragment_to_filterPlaceOfWorkFragment)
+                    findNavController().navigateUp()
                 }
                 is CountryViewState.NotFoundError -> {
                     Toast.makeText(requireContext(), "Страны не найдены", Toast.LENGTH_SHORT).show()
