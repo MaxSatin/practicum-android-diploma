@@ -26,7 +26,7 @@ class FilterPlaceOfWorkViewModel(
         loadData()
     }
 
-    private fun loadData() {
+    public fun loadData() {
         filter.postValue(getFilter())
     }
 
