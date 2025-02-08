@@ -54,6 +54,12 @@ class SearchFragment : Fragment() {
         super.onDestroyView()
     }
 
+    override fun onResume() {
+        super.onResume()
+        val text = binding.textInput.text.toString()
+        if (text.isNotEmpty())searchOnTextChanged(text)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupNavigation()
@@ -135,7 +141,6 @@ class SearchFragment : Fragment() {
             viewLifecycleOwner
         ) { it?.let { showVacancyDetails(it); viewModel.resetVacancyDetails() } }
         viewModel.observeFilterStateLiveData().observe(viewLifecycleOwner) { isChecked ->
-            Log.d("FilterFragmentState", "$isChecked")
             renderFilterState(isChecked)
         }
     }

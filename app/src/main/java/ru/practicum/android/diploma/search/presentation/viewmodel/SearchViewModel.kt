@@ -32,7 +32,7 @@ class SearchViewModel(
     private var isClickAllowed = true
     private var job: Job? = null
 
-    private val debounceSearch = debounce<String>(
+    val debounceSearch = debounce<String>(
         SEARCH_DEBOUNCE_DELAY,
         viewModelScope,
         true
@@ -61,10 +61,10 @@ class SearchViewModel(
     fun getAdapterStateLiveData(): LiveData<AdapterState> = adapterStateLiveData
 
     fun searchDebounce(changedText: String) {
-        if (latestSearchQuery == changedText) {
-            return
-        }
-        this.latestSearchQuery = changedText
+//        if (latestSearchQuery == changedText) {
+//            return
+//        }
+//        this.latestSearchQuery = changedText
         debounceSearch(changedText)
     }
 
