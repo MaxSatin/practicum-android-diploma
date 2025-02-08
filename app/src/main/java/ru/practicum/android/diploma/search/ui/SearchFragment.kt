@@ -71,9 +71,7 @@ class SearchFragment : Fragment() {
 
     private fun setupNavigation() {
         binding.filterButton.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_searchFragment_to_filterSettingsFragment
-            )
+            findNavController().navigate(R.id.action_searchFragment_to_filterSettingsFragment)
         }
     }
 
@@ -107,38 +105,28 @@ class SearchFragment : Fragment() {
         viewModel.renderFilterState()
         binding.textInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-            override fun onTextChanged(
-                s: CharSequence?,
-                start: Int,
-                before: Int,
-                count: Int,
-            ) = updateVisibilityBasedOnInput(s).also {
-                textInput = s.toString()
-                if (s.isNullOrEmpty()) {
-                    binding.clearIcon.visibility = View.GONE
-                    viewModel.clearSearchList()
-                    adapter?.submitList(emptyList())
-                    binding.searchVacanciesRV.adapter = adapter
-                } else {
-                    binding.clearIcon.visibility = View.VISIBLE
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int,) =
+                updateVisibilityBasedOnInput(s).also {
+                    textInput = s.toString()
+                    if (s.isNullOrEmpty()) {
+                        binding.clearIcon.visibility = View.GONE
+                        viewModel.clearSearchList()
+                        adapter?.submitList(emptyList())
+                        binding.searchVacanciesRV.adapter = adapter
+                    } else {
+                        binding.clearIcon.visibility = View.VISIBLE
+                    }
+                    binding.searchIcon.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
                 }
-                binding.searchIcon.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
-            }
 
-            override fun afterTextChanged(s: Editable?) {
-                searchOnTextChanged(s.toString())
-            }
+            override fun afterTextChanged(s: Editable?) { searchOnTextChanged(s.toString()) }
         })
     }
 
     private fun setupClearIcon() {
-        binding.clearIcon.setOnClickListener {
-            onClearIconPressed(); (requireContext().getSystemService(
-            Context.INPUT_METHOD_SERVICE
-            )
-                as? InputMethodManager)
-                ?.hideSoftInputFromWindow(view?.windowToken, 0)
-        }
+        binding.clearIcon.setOnClickListener { onClearIconPressed()
+            (requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+                ?.hideSoftInputFromWindow(view?.windowToken, 0) }
     }
 
     private fun updateVisibilityBasedOnInput(s: CharSequence?) = with(binding) {
