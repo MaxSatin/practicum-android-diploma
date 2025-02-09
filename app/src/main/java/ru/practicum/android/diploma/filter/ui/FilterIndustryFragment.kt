@@ -16,15 +16,15 @@ import ru.practicum.android.diploma.common.sharedprefs.models.Filter
 import ru.practicum.android.diploma.databinding.FragmentFilterIndustryBinding
 import ru.practicum.android.diploma.filter.domain.model.Industry
 import ru.practicum.android.diploma.filter.domain.model.IndustryViewState
+import ru.practicum.android.diploma.filter.presentation.viewmodel.FilterSettingsViewModel
 import ru.practicum.android.diploma.filter.presentation.viewmodel.FilterIndustryViewModel
-import ru.practicum.android.diploma.filter.presentation.viewmodel.FilterScreenViewModel
 import ru.practicum.android.diploma.filter.ui.adapters.IndustryAdapter
 
 class FilterIndustryFragment : Fragment() {
     private var _binding: FragmentFilterIndustryBinding? = null
     private val binding get() = _binding!!
-    private val viewModel by viewModel<FilterScreenViewModel>()
-    private val viewModelSettings by viewModel<FilterIndustryViewModel>()
+    private val viewModel by viewModel<FilterIndustryViewModel>()
+    private val viewModelSettings by viewModel<FilterSettingsViewModel>()
     private var listAdapter = IndustryAdapter { clickOnIndustry(it) }
 
     override fun onCreateView(
@@ -88,6 +88,7 @@ class FilterIndustryFragment : Fragment() {
             }
         }
     }
+
 
     private fun render(state: IndustryViewState) {
         when (state) {
