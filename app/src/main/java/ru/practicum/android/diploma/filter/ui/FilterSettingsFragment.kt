@@ -187,7 +187,7 @@ class FilterSettingsFragment : Fragment() {
                     updateSubmitButtonVisibility(newSalary != currentSalary)
                 }
 
-                binding.clearSalaryButton.isVisible = text.isNotBlank() || (isFocused && text.isNotBlank())
+                binding.clearSalaryButton.isVisible = isFocused && text.isNotBlank()
             }
         }
 
