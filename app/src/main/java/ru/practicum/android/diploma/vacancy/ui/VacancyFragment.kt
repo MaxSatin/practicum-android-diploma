@@ -92,7 +92,7 @@ class VacancyFragment : Fragment() {
             scheduleAndEmployment.text = getScheduleAndEmployment(vacancy)
             description.text = Html.fromHtml(vacancy.description ?: "", Html.FROM_HTML_MODE_COMPACT)
             serverErrorPlaceholder.visibility = View.GONE
-            if (vacancy.keySkills == null) {
+            if (vacancy.keySkills.isNullOrBlank()) {
                 keySkillTitle.visibility = View.GONE
             } else {
                 keySkill.text = Html.fromHtml(vacancy.keySkills, Html.FROM_HTML_MODE_COMPACT)

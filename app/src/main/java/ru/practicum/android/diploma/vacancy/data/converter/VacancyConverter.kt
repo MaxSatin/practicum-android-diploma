@@ -1,7 +1,9 @@
 package ru.practicum.android.diploma.vacancy.data.converter
 
 import android.content.Context
+import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.common.util.Converter.convertSalaryToString
@@ -89,14 +91,14 @@ class VacancyConverter(private val context: Context) {
         val keySkillsString = StringBuilder()
         val bulletDot = context.getString(R.string.bullet_dot)
 
-        // Проверяем, является ли keySkills списком и не пусто ли оно
         if (keySkills is List<*>) {
             val type = object : TypeToken<List<KeySkillDto>>() {}.type
 
             val keySkillList: List<KeySkillDto> = try {
                 gson.fromJson(gson.toJson(keySkills), type)
-            } catch (e: Exception) {
-                emptyList() // В случае ошибки десериализации
+            } catch (e: JsonSyntaxException) {
+                Log.e("VacancyConverter", "Ошибка парсинга JSON", e)
+                emptyList()
             }
 
             keySkillList.forEach { skill ->
