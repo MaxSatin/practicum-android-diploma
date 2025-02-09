@@ -16,8 +16,8 @@ import ru.practicum.android.diploma.common.sharedprefs.models.Filter
 import ru.practicum.android.diploma.databinding.FragmentFilterIndustryBinding
 import ru.practicum.android.diploma.filter.domain.model.Industry
 import ru.practicum.android.diploma.filter.domain.model.IndustryViewState
-import ru.practicum.android.diploma.filter.presentation.viewmodel.FilterSettingsViewModel
 import ru.practicum.android.diploma.filter.presentation.viewmodel.FilterIndustryViewModel
+import ru.practicum.android.diploma.filter.presentation.viewmodel.FilterSettingsViewModel
 import ru.practicum.android.diploma.filter.ui.adapters.IndustryAdapter
 
 class FilterIndustryFragment : Fragment() {
@@ -88,7 +88,6 @@ class FilterIndustryFragment : Fragment() {
             }
         }
     }
-
 
     private fun render(state: IndustryViewState) {
         when (state) {

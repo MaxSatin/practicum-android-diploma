@@ -125,7 +125,8 @@ class FilterSettingsFragment : Fragment() {
             }
         }
     }
-    //INDUSTRY
+
+    // INDUSTRY
     private fun setupIndustryUI(industrySP: IndustrySP?) {
         updateIndustryUI(industrySP) { industry ->
             binding.industryBtn.setOnClickListener {
@@ -157,7 +158,7 @@ class FilterSettingsFragment : Fragment() {
         }
     }
 
-    //SALLARY EDIT TEXT
+    // SALLARY EDIT TEXT
     private fun setupSalary(salary: Int?) {
         salary?.let { binding.inputSalary.setText(it.toString()) }
 
@@ -197,12 +198,12 @@ class FilterSettingsFragment : Fragment() {
         }
     }
 
-    //WITH SALLARY CHECKBOX
+    // WITH SALLARY CHECKBOX
     private fun setupSalaryCheckbox(withSalary: Boolean?) {
         withSalary?.let { binding.checkBox.isChecked = it }
 
         binding.checkBox.setOnCheckedChangeListener { _, isChecked ->
-            if(isChecked) {
+            if (isChecked) {
                 viewModel.updateFilter(Filter(withSalary = true))
             } else {
                 viewModel.clearFilterField("withSalary")
@@ -210,7 +211,7 @@ class FilterSettingsFragment : Fragment() {
         }
     }
 
-    //RESET BUTTON
+    // RESET BUTTON
     private fun resetButtonClickListener() {
         viewModel.clearFilter()
         updateWorkplaceUI(null, null)
