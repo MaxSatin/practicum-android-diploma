@@ -19,7 +19,8 @@ class VacancyDetailsViewModel(
     private val vacancyId: String,
     private val interactor: VacancyDetailsInteractor,
     private val favoriteInteractor: FavoriteInteractor,
-    private val converter: VacancyConverter
+    private val converter: VacancyConverter,
+    private val isFromFavoritesScreen: Boolean
 ) : ViewModel() {
     private val vacancyState = MutableLiveData<VacancyScreenState>()
     private var vacancy: Vacancy? = null
@@ -53,7 +54,7 @@ class VacancyDetailsViewModel(
         renderState(VacancyScreenState.LoadingState)
 
         viewModelScope.launch(Dispatchers.IO) {
-            interactor.getVacancyDetails(vacancyId).collect { state ->
+            interactor.getVacancyDetails(vacancyId, isFromFavoritesScreen).collect { state ->
                 when (state) {
                     is VacancyScreenState.ContentState -> {
                         vacancy = state.vacancy

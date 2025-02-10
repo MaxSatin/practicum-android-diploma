@@ -346,7 +346,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun showVacancyDetails(vacancyId: String) = findNavController()
-        .navigate(R.id.action_searchFragment_to_vacancyFragment, VacancyFragment.createArgs(vacancyId))
+        .navigate(R.id.action_searchFragment_to_vacancyFragment, VacancyFragment.createArgs(vacancyId, false))
 
     private fun launchJob(message: String) {
         job = CoroutineScope(Dispatchers.Main).launch {

@@ -121,13 +121,13 @@ class FavoritesFragment : Fragment(), VacancyViewHolder.OnItemClickListener {
     }
 
     override fun onItemClick(item: VacancyItems) {
-        showVacancyDetails(item.id)
+        showVacancyDetails(item.id, true)
     }
 
-    private fun showVacancyDetails(vacancyId: String) {
+    private fun showVacancyDetails(vacancyId: String, isFromFavoritesScreen: Boolean) {
         findNavController().navigate(
             R.id.action_favoritesFragment_to_vacancyFragment,
-            VacancyFragment.createArgs(vacancyId)
+            VacancyFragment.createArgs(vacancyId, isFromFavoritesScreen)
         )
     }
 
