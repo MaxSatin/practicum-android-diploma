@@ -59,8 +59,7 @@ class SearchFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        adapter?.clearData()
-        viewModel.searchOnAppliedFilter(textInput)
+        checkAndUpdateIfFilterChanged()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -70,6 +69,16 @@ class SearchFragment : Fragment() {
         setupTextInput()
         setupClearIcon()
         observeViewModel()
+    }
+
+    private fun checkAndUpdateIfFilterChanged() {
+        viewModel.refreshCurrentFilter()
+        val filter = viewModel.currentFilter.value
+        val updatedFilter = viewModel.updatedFilter.value
+        if (filter != updatedFilter) {
+            adapter?.clearData()
+            viewModel.searchOnAppliedFilter(textInput)
+        }
     }
 
     private fun setupNavigation() {
