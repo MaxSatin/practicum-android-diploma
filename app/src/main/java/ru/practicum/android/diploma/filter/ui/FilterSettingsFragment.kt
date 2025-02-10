@@ -43,8 +43,9 @@ class FilterSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.refreshCurrentFilter()
+        viewModel.refreshUpdatedFilter()
         val currentFilter = viewModel.currentFilter.value
+        println("Currnet  Filter onViewCreated: $currentFilter")
 
         setupWorkplaceUI(currentFilter?.areaCountry, currentFilter?.areaCity)
         setupIndustryUI(currentFilter?.industrySP)
@@ -55,14 +56,13 @@ class FilterSettingsFragment : Fragment() {
             binding.submitButton.isVisible = updatedFilter != currentFilter
             binding.resetButton.isVisible = updatedFilter != Filter()
         }
-
         setupListeners()
     }
 
     override fun onResume() {
         super.onResume()
 
-        viewModel.refreshCurrentFilter()
+        viewModel.refreshUpdatedFilter()
 
         val currentFilter = viewModel.currentFilter.value
         val updatedFilter = viewModel.updatedFilter.value
@@ -220,6 +220,9 @@ class FilterSettingsFragment : Fragment() {
         updateIndustryUI(null)
         binding.inputSalary.text = null
         binding.checkBox.isChecked = false
+        binding.submitButton.isVisible = false
+        viewModel.refreshCurrentFilter()
+        viewModel.refreshUpdatedFilter()
     }
 
     private fun navigateToPlaceOfWorkFragment() {

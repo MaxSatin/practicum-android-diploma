@@ -72,13 +72,14 @@ class SearchFragment : Fragment() {
     }
 
     private fun checkAndUpdateIfFilterChanged() {
-        viewModel.refreshCurrentFilter()
+        viewModel.refreshUpdatedFilter()
         val filter = viewModel.currentFilter.value
         val updatedFilter = viewModel.updatedFilter.value
         if (filter != updatedFilter) {
             adapter?.clearData()
             viewModel.searchOnAppliedFilter(textInput)
         }
+        println("filter: $filter,\nupdatedFilter: $updatedFilter")
     }
 
     private fun setupNavigation() {
