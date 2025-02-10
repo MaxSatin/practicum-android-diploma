@@ -110,9 +110,34 @@ class SearchFragment : Fragment() {
         viewModel.renderFilterState()
         binding.textInput.requestFocus()
         binding.textInput.setOnEditorActionListener { _, actionId, _ -> if (actionId == EditorInfo.IME_ACTION_DONE) {
-            viewModel.searchVacancy(
-                binding.textInput.text.toString()
-            ).let { true }
+
+            var checkError = false
+            viewModel.observeState().observe(viewLifecycleOwner) {
+                when(it){
+                    SearchViewState.ConnectionError,  SearchViewState.NotFoundError, SearchViewState.ServerError-> {
+                        checkError = true
+                    }
+                    else -> {
+                        checkError = false
+                    }
+                }
+            }
+
+            if (checkError == true) {
+                viewModel.searchVacancy(
+                    binding.textInput.text.toString()
+                )
+            }else{
+                viewModel.searchDebounce(
+                    binding.textInput.text.toString()
+                )
+            }
+
+            (requireContext().getSystemService(
+                Context.INPUT_METHOD_SERVICE
+            ) as? InputMethodManager)?.hideSoftInputFromWindow(view?.windowToken, 0)
+                .let { true }
+
         } else {
             false
         } }
