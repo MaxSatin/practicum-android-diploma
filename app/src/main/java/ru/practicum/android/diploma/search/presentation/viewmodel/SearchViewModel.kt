@@ -71,6 +71,10 @@ class SearchViewModel(
     }
 
     fun refreshCurrentFilter() {
+        _currentFilter.value = sharedPrefsInteractor.getFilter()
+    }
+
+    fun refreshUpdatedFilter() {
         val updatedFilter = sharedPrefsInteractor.getFilter()
         _updatedFilter.value = updatedFilter
     }
@@ -94,6 +98,7 @@ class SearchViewModel(
 
     fun searchVacancy(searchQuery: String) {
         Log.d("CurrentPage", "$currentPage maxpages: $maxPages")
+        refreshCurrentFilter()
         if (searchQuery.isNotEmpty()) {
             Log.d("SearchQuery", "$searchQuery")
             if (!isNextPageLoading) {

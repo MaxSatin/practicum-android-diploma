@@ -20,21 +20,24 @@ class FilterSettingsViewModel(private val sharedPrefsInteractor: SharedPrefsInte
 
     fun updateFilter(filter: Filter) {
         sharedPrefsInteractor.updateFilter(filter)
-        refreshCurrentFilter()
+        refreshUpdatedFilter()
     }
 
     fun clearFilterField(field: String) {
         sharedPrefsInteractor.clearFilterField(field)
-        refreshCurrentFilter()
+        refreshUpdatedFilter()
     }
 
     fun clearFilter() {
         sharedPrefsInteractor.clearFilter()
-        refreshCurrentFilter()
+        refreshUpdatedFilter()
     }
 
-    fun refreshCurrentFilter() {
+    fun refreshUpdatedFilter() {
         val updatedFilter = sharedPrefsInteractor.getFilter()
         _updatedFilter.value = updatedFilter
+    }
+    fun refreshCurrentFilter() {
+        _currentFilter.value = sharedPrefsInteractor.getFilter()
     }
 }
