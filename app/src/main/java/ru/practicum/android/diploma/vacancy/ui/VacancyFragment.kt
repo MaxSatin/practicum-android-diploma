@@ -74,7 +74,8 @@ class VacancyFragment : Fragment() {
             VacancyScreenState.EmptyState -> showEmpty()
             VacancyScreenState.LoadingState -> showLoading()
             VacancyScreenState.NetworkErrorState -> showNetworkError()
-            else -> {}
+            VacancyScreenState.ConnectionError -> showNetworkError()
+            VacancyScreenState.ServerError -> showNetworkError()
         }
     }
 
