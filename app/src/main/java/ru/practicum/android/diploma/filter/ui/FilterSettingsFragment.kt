@@ -45,7 +45,6 @@ class FilterSettingsFragment : Fragment() {
 
         viewModel.refreshUpdatedFilter()
         val currentFilter = viewModel.currentFilter.value
-        println("Currnet  Filter onViewCreated: $currentFilter")
 
         setupWorkplaceUI(currentFilter?.areaCountry, currentFilter?.areaCity)
         setupIndustryUI(currentFilter?.industrySP)

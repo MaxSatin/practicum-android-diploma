@@ -79,7 +79,6 @@ class SearchFragment : Fragment() {
             adapter?.clearData()
             viewModel.searchOnAppliedFilter(textInput)
         }
-        println("filter: $filter,\nupdatedFilter: $updatedFilter")
     }
 
     private fun setupNavigation() {
