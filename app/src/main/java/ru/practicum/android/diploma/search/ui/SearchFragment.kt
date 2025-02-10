@@ -110,11 +110,10 @@ class SearchFragment : Fragment() {
         viewModel.renderFilterState()
         binding.textInput.requestFocus()
         binding.textInput.setOnEditorActionListener { _, actionId, _ -> if (actionId == EditorInfo.IME_ACTION_DONE) {
-
             var checkError = false
             viewModel.observeState().observe(viewLifecycleOwner) {
-                when(it){
-                    SearchViewState.ConnectionError,  SearchViewState.NotFoundError, SearchViewState.ServerError-> {
+                when (it) {
+                    SearchViewState.ConnectionError, SearchViewState.NotFoundError, SearchViewState.ServerError -> {
                         checkError = true
                     }
                     else -> {
@@ -123,11 +122,11 @@ class SearchFragment : Fragment() {
                 }
             }
 
-            if (checkError == true) {
+            if (checkError) {
                 viewModel.searchVacancy(
                     binding.textInput.text.toString()
                 )
-            }else{
+            } else {
                 viewModel.searchDebounce(
                     binding.textInput.text.toString()
                 )
