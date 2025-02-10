@@ -69,6 +69,11 @@ class FilterPlaceOfWorkFragment : Fragment() {
             binding.smallAndBigCountry.isVisible = false
             binding.onlyBigCountry.isVisible = true
             binding.buttonImageCountry.setImageResource(R.drawable.ic_arrow_forward_24px)
+            binding.buttonImageCountry.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_filterPlaceOfWorkFragment_to_filterRegionFragment
+                )
+            }
         } else {
             binding.smallAndBigCountry.isVisible = true
             binding.onlyBigCountry.isVisible = false
@@ -82,6 +87,11 @@ class FilterPlaceOfWorkFragment : Fragment() {
             binding.smallAndBigRegion.isVisible = false
             binding.onlyBigRegion.isVisible = true
             binding.buttonImageRegion.setImageResource(R.drawable.ic_arrow_forward_24px)
+            binding.buttonImageRegion.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_filterPlaceOfWorkFragment_to_filterCountriesFragment
+                )
+            }
         } else {
             binding.smallAndBigRegion.isVisible = true
             binding.onlyBigRegion.isVisible = false
