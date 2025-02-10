@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,6 +44,7 @@ class SearchFragment : Fragment() {
     private var job: Job? = null
     private var textInput: String = ""
     private var isLoading = false
+    private var isFromTopBar = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
@@ -69,15 +71,20 @@ class SearchFragment : Fragment() {
         setupTextInput()
         setupClearIcon()
         observeViewModel()
+        isFromTopBarListener()
     }
 
     private fun checkAndUpdateIfFilterChanged() {
-        viewModel.refreshUpdatedFilter()
-        val filter = viewModel.currentFilter.value
-        val updatedFilter = viewModel.updatedFilter.value
-        if (filter != updatedFilter) {
-            adapter?.clearData()
-            viewModel.searchOnAppliedFilter(textInput)
+        if (isFromTopBar) {
+            isFromTopBar = false
+        } else {
+            viewModel.refreshUpdatedFilter()
+            val filter = viewModel.currentFilter.value
+            val updatedFilter = viewModel.updatedFilter.value
+            if (filter != updatedFilter) {
+                adapter?.clearData()
+                viewModel.searchOnAppliedFilter(textInput)
+            }
         }
     }
 
@@ -349,7 +356,15 @@ class SearchFragment : Fragment() {
         }
     }
 
+    private fun isFromTopBarListener() {
+        setFragmentResultListener(TOP_BAR_BUTTON_CLICKED) { _, bundle ->
+            isFromTopBar = bundle.getBoolean(IS_FROM_TOP_BAR, false)
+        }
+    }
+
     companion object {
+        private const val IS_FROM_TOP_BAR = "isFromTopBar"
+        private const val TOP_BAR_BUTTON_CLICKED = "topBarButtonClicked"
         private const val FIRST_ITEM_MARGIN_TOP = 46
         private const val DELAY_2000 = 2_000L
         private const val NO_VACANCIES_FOUND = "Таких вакансий нет"
