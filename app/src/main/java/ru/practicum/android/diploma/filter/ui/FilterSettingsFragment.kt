@@ -219,9 +219,9 @@ class FilterSettingsFragment : Fragment() {
         updateIndustryUI(null)
         binding.inputSalary.text = null
         binding.checkBox.isChecked = false
-        binding.submitButton.isVisible = false
         viewModel.refreshCurrentFilter()
         viewModel.refreshUpdatedFilter()
+        binding.submitButton.isVisible = false
     }
 
     private fun navigateToPlaceOfWorkFragment() {
