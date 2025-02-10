@@ -60,6 +60,21 @@ class SearchViewModel(
     private val adapterStateLiveData = MutableLiveData<AdapterState>()
     fun getAdapterStateLiveData(): LiveData<AdapterState> = adapterStateLiveData
 
+    private val _currentFilter = MutableLiveData<Filter>()
+    val currentFilter: LiveData<Filter> get() = _currentFilter
+
+    private val _updatedFilter = MutableLiveData<Filter>()
+    val updatedFilter: LiveData<Filter> get() = _updatedFilter
+
+    init {
+        _currentFilter.value = sharedPrefsInteractor.getFilter()
+    }
+
+    fun refreshCurrentFilter() {
+        val updatedFilter = sharedPrefsInteractor.getFilter()
+        _updatedFilter.value = updatedFilter
+    }
+
     fun searchDebounce(changedText: String) {
         if (latestSearchQuery == changedText) {
             return
@@ -78,7 +93,7 @@ class SearchViewModel(
     }
 
     fun searchVacancy(searchQuery: String) {
-        Log.d("CurrentPage", "$currentPage")
+        Log.d("CurrentPage", "$currentPage maxpages: $maxPages")
         if (searchQuery.isNotEmpty()) {
             Log.d("SearchQuery", "$searchQuery")
             if (!isNextPageLoading) {
@@ -91,7 +106,6 @@ class SearchViewModel(
                             .collect { viewState ->
                                 renderScreenState(viewState)
                                 isNextPageLoading = false
-                                currentPage = 0
                             }
 
                     } finally {
@@ -120,7 +134,7 @@ class SearchViewModel(
                     } finally {
                         isNextPageLoading = false
                     }
-                    Log.d("CurrentPage", "$currentPage")
+                    Log.d("CurrentPage", "$currentPage maxpages: $maxPages")
                     renderAdapterState(AdapterState.Idle)
                 }
             }
