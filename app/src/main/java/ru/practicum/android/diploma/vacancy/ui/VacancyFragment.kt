@@ -72,7 +72,7 @@ class VacancyFragment : Fragment() {
 
     private fun renderState(state: VacancyScreenState) {
         currentState = state
-        println("renderState: $currentState")
+
         when (state) {
             is VacancyScreenState.ContentState -> showContent(state.vacancy)
             VacancyScreenState.EmptyState -> showEmpty()

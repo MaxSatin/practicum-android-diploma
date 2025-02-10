@@ -21,18 +21,30 @@ class VacancyDetailsRepositoryImpl(
 
     override fun getVacancyDetails(vacancyId: String, isFromFavoritesScreen: Boolean): Flow<VacancyScreenState> = flow {
         if (isFromFavoritesScreen) {
-            println("getVacancyDetails isFavorite")
             favoriteInteractor.getVacancyById(vacancyId).collect { vacancyFavorite ->
                 if (vacancyFavorite != null) {
                     val data = mapper.mapFavoriteToVacancy(vacancyFavorite)
                     val response = mapper.mapFavoriteToDetails(vacancyFavorite)
-                    emit(VacancyScreenState.ContentState(data, response))
-                } else {
-                    emit(VacancyScreenState.EmptyState)
+
+                    val apiResponse = networkClient.doRequest(VacancyDetailsRequest(vacancyId))
+                    when (apiResponse.resultCode) {
+                        Response.SUCCESS_RESPONSE_CODE -> {
+                            emit(VacancyScreenState.ContentState(data, response))
+                        }
+                        Response.BAD_REQUEST_ERROR_CODE, Response.NOT_FOUND_ERROR_CODE -> {
+                            favoriteInteractor.deleteVacancyById(vacancyId)
+                            emit(VacancyScreenState.EmptyState)
+                        }
+                        Response.NO_INTERNET_ERROR_CODE -> {
+                            emit(VacancyScreenState.ContentState(data, response))
+                        }
+                        else -> {
+                            emit(VacancyScreenState.ServerError)
+                        }
+                    }
                 }
             }
         } else {
-            println("getVacancyDetails not Favorite")
             val response = networkClient.doRequest(VacancyDetailsRequest(vacancyId))
             when (response.resultCode) {
                 Response.SUCCESS_RESPONSE_CODE -> {
