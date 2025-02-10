@@ -354,7 +354,7 @@ class SearchFragment : Fragment() {
         private const val DELAY_2000 = 2_000L
         private const val NO_VACANCIES_FOUND = "Таких вакансий нет"
         private const val ERROR_NO_VACANCIES_FOUND = "Ошибка. Вакансии не найдены"
-        private const val CHECK_YOUR_CONNECTION = "Проверьте подключение"
+        private const val CHECK_YOUR_CONNECTION = "Проверьте подключение к интернету"
         private const val SERVER_ERROR = "Ошибка сервера"
     }
 }
