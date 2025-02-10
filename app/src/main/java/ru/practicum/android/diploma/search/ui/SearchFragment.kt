@@ -122,7 +122,7 @@ class SearchFragment : Fragment() {
             var checkError = false
             viewModel.observeState().observe(viewLifecycleOwner) {
                 when (it) {
-                    SearchViewState.ConnectionError, SearchViewState.NotFoundError, SearchViewState.ServerError -> {
+                    SearchViewState.ConnectionError, SearchViewState.ServerError -> {
                         checkError = true
                     }
                     else -> {
