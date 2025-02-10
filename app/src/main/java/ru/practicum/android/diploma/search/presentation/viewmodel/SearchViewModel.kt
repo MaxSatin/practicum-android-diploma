@@ -97,6 +97,7 @@ class SearchViewModel(
     }
 
     fun searchVacancy(searchQuery: String) {
+        currentPage = 0
         Log.d("CurrentPage", "$currentPage maxpages: $maxPages")
         refreshCurrentFilter()
         if (searchQuery.isNotEmpty()) {
