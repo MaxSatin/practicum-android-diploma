@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -95,7 +96,6 @@ class FilterSettingsFragment : Fragment() {
                 viewModel.clearFilterField("areaCountry")
                 viewModel.clearFilterField("areaCity")
                 updateWorkplaceUI(null, null)
-                updateSubmitButtonVisibility(true)
             }
         }
     }
@@ -108,9 +108,6 @@ class FilterSettingsFragment : Fragment() {
             else -> null
         }
         with(binding) {
-            if (workplaceText != null) {
-                updateSubmitButtonVisibility(true)
-            }
             workplaceValue.text = workplaceText
             workplaceValue.visibility = if (workplaceText != null) View.VISIBLE else View.GONE
             workplaceBtn.setImageResource(
@@ -132,7 +129,6 @@ class FilterSettingsFragment : Fragment() {
             binding.industryBtn.setOnClickListener {
                 viewModel.clearFilterField("industrySP")
                 updateIndustryUI(null)
-                updateSubmitButtonVisibility(true)
             }
         }
     }
@@ -140,9 +136,6 @@ class FilterSettingsFragment : Fragment() {
     private fun updateIndustryUI(industrySP: IndustrySP?, onClear: ((IndustrySP?) -> Unit)? = null) {
         val industryText = industrySP?.name
         with(binding) {
-            if (industryText != null) {
-                updateSubmitButtonVisibility(true)
-            }
             industryValue.text = industryText
             industryValue.visibility = if (industryText != null) View.VISIBLE else View.GONE
             industryBtn.setImageResource(
@@ -172,6 +165,16 @@ class FilterSettingsFragment : Fragment() {
             hideKeyboard(binding.root, requireContext())
             viewModel.clearFilterField("salary")
         }
+
+        binding.inputSalary.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                hideKeyboard(binding.root, requireContext())
+                binding.inputSalary.clearFocus()
+                true
+            }
+            false
+        }
+
     }
 
     private fun setupInputSalaryListeners() {
@@ -184,7 +187,6 @@ class FilterSettingsFragment : Fragment() {
 
                 if (newSalary != currentSalary) {
                     viewModel.updateFilter(Filter(salary = newSalary))
-                    updateSubmitButtonVisibility(newSalary != currentSalary)
                 }
 
                 binding.clearSalaryButton.isVisible = isFocused && text.isNotBlank()
@@ -218,7 +220,6 @@ class FilterSettingsFragment : Fragment() {
         updateIndustryUI(null)
         binding.inputSalary.text = null
         binding.checkBox.isChecked = false
-        updateSubmitButtonVisibility(false)
     }
 
     private fun navigateToPlaceOfWorkFragment() {
@@ -227,10 +228,6 @@ class FilterSettingsFragment : Fragment() {
 
     private fun navigateToIndustryFragment() {
         findNavController().navigate(R.id.action_filterSettingsFragment_to_filterIndustryFragment)
-    }
-
-    private fun updateSubmitButtonVisibility(state: Boolean) {
-        binding.submitButton.isVisible = state
     }
 
     private fun submitFilter() {

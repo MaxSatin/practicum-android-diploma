@@ -71,7 +71,7 @@ class FilterPlaceOfWorkFragment : Fragment() {
             binding.buttonImageCountry.setImageResource(R.drawable.ic_arrow_forward_24px)
             binding.buttonImageCountry.setOnClickListener {
                 findNavController().navigate(
-                    R.id.action_filterPlaceOfWorkFragment_to_filterRegionFragment
+                    R.id.action_filterPlaceOfWorkFragment_to_filterCountriesFragment
                 )
             }
         } else {
@@ -79,6 +79,12 @@ class FilterPlaceOfWorkFragment : Fragment() {
             binding.onlyBigCountry.isVisible = false
             binding.bigTextCountry.text = country.name
             binding.buttonImageCountry.setImageResource(R.drawable.ic_close_24px)
+            binding.buttonImageCountry.setOnClickListener {
+                viewModel.clearFilterField("areaCountry")
+                viewModel.clearFilterField("areaCity")
+                showCountry(null)
+                showCity(null)
+            }
         }
     }
 
@@ -89,7 +95,7 @@ class FilterPlaceOfWorkFragment : Fragment() {
             binding.buttonImageRegion.setImageResource(R.drawable.ic_arrow_forward_24px)
             binding.buttonImageRegion.setOnClickListener {
                 findNavController().navigate(
-                    R.id.action_filterPlaceOfWorkFragment_to_filterCountriesFragment
+                    R.id.action_filterPlaceOfWorkFragment_to_filterRegionFragment
                 )
             }
         } else {
