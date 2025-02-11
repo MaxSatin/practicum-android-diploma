@@ -19,8 +19,8 @@ class VacancyDetailsRepositoryImpl(
     private val favoriteInteractor: FavoriteInteractor
 ) : VacancyDetailsRepository {
 
-    override fun getVacancyDetails(vacancyId: String, isFromFavoritesScreen: Boolean): Flow<VacancyScreenState> = flow {
-        if (isFromFavoritesScreen) {
+    override fun getVacancyDetails(vacancyId: String, fromFav: Boolean): Flow<VacancyScreenState> = flow {
+        if (fromFav) {
             favoriteInteractor.getVacancyById(vacancyId).collect { vacancyFavorite ->
                 if (vacancyFavorite != null) {
                     val data = mapper.mapFavoriteToVacancy(vacancyFavorite)
