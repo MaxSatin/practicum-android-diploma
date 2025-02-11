@@ -29,8 +29,8 @@ val viewModelModule = module {
         FilterCountriesViewModel(get(), get())
     }
 
-    viewModel { (vacancyId: String) ->
-        VacancyDetailsViewModel(vacancyId, get(), get(), get())
+    viewModel { (vacancyId: String, isFromFavoritesScreen: Boolean) ->
+        VacancyDetailsViewModel(vacancyId, get(), get(), get(), isFromFavoritesScreen)
     }
 
     viewModel {

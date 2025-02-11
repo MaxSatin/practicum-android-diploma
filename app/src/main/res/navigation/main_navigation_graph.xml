@@ -34,6 +34,9 @@
         <argument
             android:name="vacancyId"
             app:argType="string" />
+        <argument
+            android:name="isFromFavoriteScreen"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/favoritesFragment"
