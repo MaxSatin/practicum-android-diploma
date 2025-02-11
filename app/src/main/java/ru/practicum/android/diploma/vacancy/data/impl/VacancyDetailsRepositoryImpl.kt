@@ -20,7 +20,10 @@ class VacancyDetailsRepositoryImpl(
     private val favoriteInteractor: FavoriteInteractor
 ) : VacancyDetailsRepository {
 
-    override fun getVacancyDetails(vacancyId: String, isFromFavoritesScreen: Boolean): Flow<VacancyScreenState> = flow {
+    override fun getVacancyDetails(
+        vacancyId: String,
+        isFromFavoritesScreen: Boolean
+    ): Flow<VacancyScreenState> = flow {
         if (isFromFavoritesScreen) {
             favoriteInteractor.getVacancyById(vacancyId).collect { vacancyFavorite ->
                 if (vacancyFavorite != null) {
@@ -38,7 +41,12 @@ class VacancyDetailsRepositoryImpl(
         }
     }.flowOn(Dispatchers.IO)
 
-    private suspend fun handleApiResponseDatabase(resultCode: Int, data: Vacancy, response: VacancyDetailsResponse, vacancyId: String): VacancyScreenState {
+    private suspend fun handleApiResponseDatabase(
+        resultCode: Int,
+        data: Vacancy,
+        response: VacancyDetailsResponse,
+        vacancyId: String
+    ): VacancyScreenState {
         return when (resultCode) {
             Response.SUCCESS_RESPONSE_CODE -> {
                 VacancyScreenState.ContentState(data, response)
