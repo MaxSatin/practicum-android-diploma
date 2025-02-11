@@ -26,7 +26,10 @@ class VacancyFragment : Fragment() {
     private var currentState: VacancyScreenState? = null
     private val vacancyId by lazy { requireArguments().getString(VACANCY_ID) }
     private val viewModel by viewModel<VacancyDetailsViewModel> {
-        parametersOf(vacancyId)
+        parametersOf(vacancyId, isFromFavoritesScreen)
+    }
+    private val isFromFavoritesScreen by lazy {
+        requireArguments().getBoolean(IS_FROM_FAVORITES_SCREEN, false)
     }
 
     override fun onCreateView(
@@ -69,12 +72,14 @@ class VacancyFragment : Fragment() {
 
     private fun renderState(state: VacancyScreenState) {
         currentState = state
+
         when (state) {
             is VacancyScreenState.ContentState -> showContent(state.vacancy)
             VacancyScreenState.EmptyState -> showEmpty()
             VacancyScreenState.LoadingState -> showLoading()
             VacancyScreenState.NetworkErrorState -> showNetworkError()
-            else -> {}
+            VacancyScreenState.ConnectionError -> showNetworkError()
+            VacancyScreenState.ServerError -> showNetworkError()
         }
     }
 
@@ -92,7 +97,7 @@ class VacancyFragment : Fragment() {
             scheduleAndEmployment.text = getScheduleAndEmployment(vacancy)
             description.text = Html.fromHtml(vacancy.description ?: "", Html.FROM_HTML_MODE_COMPACT)
             serverErrorPlaceholder.visibility = View.GONE
-            if (vacancy.keySkills.isEmpty()) {
+            if (vacancy.keySkills.isNullOrBlank()) {
                 keySkillTitle.visibility = View.GONE
             } else {
                 keySkill.text = Html.fromHtml(vacancy.keySkills, Html.FROM_HTML_MODE_COMPACT)
@@ -174,8 +179,13 @@ class VacancyFragment : Fragment() {
 
     companion object {
         private const val VACANCY_ID = "vacancyId"
-        fun createArgs(vacancyId: String): Bundle {
-            return bundleOf(VACANCY_ID to vacancyId)
+        private const val IS_FROM_FAVORITES_SCREEN = "is_from_favorites_screen"
+
+        fun createArgs(vacancyId: String, isFromFavoritesScreen: Boolean): Bundle {
+            return bundleOf(
+                VACANCY_ID to vacancyId,
+                IS_FROM_FAVORITES_SCREEN to isFromFavoritesScreen
+            )
         }
     }
 }

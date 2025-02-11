@@ -8,7 +8,7 @@ import ru.practicum.android.diploma.vacancy.presentation.VacancyScreenState
 class VacancyDetailsInteractorImpl(
     private val repository: VacancyDetailsRepository
 ) : VacancyDetailsInteractor {
-    override fun getVacancyDetails(vacancyId: String): Flow<VacancyScreenState> {
-        return repository.getVacancyDetails(vacancyId)
+    override fun getVacancyDetails(vacancyId: String, isFromFavoritesScreen: Boolean): Flow<VacancyScreenState> {
+        return repository.getVacancyDetails(vacancyId, isFromFavoritesScreen)
     }
 }

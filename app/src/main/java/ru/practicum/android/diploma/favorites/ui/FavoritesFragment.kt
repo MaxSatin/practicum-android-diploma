@@ -83,7 +83,7 @@ class FavoritesFragment : Fragment(), VacancyViewHolder.OnItemClickListener {
         recyclerView.visibility = View.GONE
 
         if (message == getString(R.string.no_vacancies_found_text_hint)) {
-            placeholderImage.setImageResource(R.drawable.failed_to_load_vacancies_ph)
+            placeholderImage.setImageResource(R.drawable.failed_to_load_ph)
         } else {
             placeholderImage.setImageResource(R.drawable.list_is_empty)
         }
@@ -121,13 +121,13 @@ class FavoritesFragment : Fragment(), VacancyViewHolder.OnItemClickListener {
     }
 
     override fun onItemClick(item: VacancyItems) {
-        showVacancyDetails(item.id)
+        showVacancyDetails(item.id, true)
     }
 
-    private fun showVacancyDetails(vacancyId: String) {
+    private fun showVacancyDetails(vacancyId: String, isFromFavoritesScreen: Boolean) {
         findNavController().navigate(
             R.id.action_favoritesFragment_to_vacancyFragment,
-            VacancyFragment.createArgs(vacancyId)
+            VacancyFragment.createArgs(vacancyId, isFromFavoritesScreen)
         )
     }
 

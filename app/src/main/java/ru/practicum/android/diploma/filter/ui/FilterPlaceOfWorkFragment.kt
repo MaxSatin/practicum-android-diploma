@@ -33,19 +33,12 @@ class FilterPlaceOfWorkFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.getFilterLiveData().observe(viewLifecycleOwner) { filter ->
-            selectFilter = filter
-            showCountry(filter.areaCountry)
-            showCity(filter.areaCity)
-            binding.btnSelectPlaceOfWork.isVisible = filter.areaCountry != null || filter.areaCity != null
-        }
-
         binding.topBar.setOnClickListener {
-            findNavController().navigate(R.id.action_filterPlaceOfWorkFragment_to_filterSettingsFragment)
+            findNavController().navigateUp()
         }
 
         binding.btnSelectPlaceOfWork.setOnClickListener {
-            findNavController().navigate(R.id.action_filterPlaceOfWorkFragment_to_filterSettingsFragment)
+            findNavController().navigateUp()
         }
 
         binding.frameCountry.setOnClickListener {
@@ -63,6 +56,12 @@ class FilterPlaceOfWorkFragment : Fragment() {
                 )
             }
         }
+        binding.buttonImageCountry.setOnClickListener {
+            if (selectFilter?.areaCountry != null) {
+                viewModel.clearFilterField("areaCountry")
+                showCountry(null)
+            }
+        }
     }
 
     private fun showCountry(country: Country?) {
@@ -70,6 +69,11 @@ class FilterPlaceOfWorkFragment : Fragment() {
             binding.smallAndBigCountry.isVisible = false
             binding.onlyBigCountry.isVisible = true
             binding.buttonImageCountry.setImageResource(R.drawable.ic_arrow_forward_24px)
+            binding.buttonImageCountry.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_filterPlaceOfWorkFragment_to_filterCountriesFragment
+                )
+            }
         } else {
             binding.smallAndBigCountry.isVisible = true
             binding.onlyBigCountry.isVisible = false
@@ -77,7 +81,9 @@ class FilterPlaceOfWorkFragment : Fragment() {
             binding.buttonImageCountry.setImageResource(R.drawable.ic_close_24px)
             binding.buttonImageCountry.setOnClickListener {
                 viewModel.clearFilterField("areaCountry")
+                viewModel.clearFilterField("areaCity")
                 showCountry(null)
+                showCity(null)
             }
         }
     }
@@ -87,6 +93,11 @@ class FilterPlaceOfWorkFragment : Fragment() {
             binding.smallAndBigRegion.isVisible = false
             binding.onlyBigRegion.isVisible = true
             binding.buttonImageRegion.setImageResource(R.drawable.ic_arrow_forward_24px)
+            binding.buttonImageRegion.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_filterPlaceOfWorkFragment_to_filterRegionFragment
+                )
+            }
         } else {
             binding.smallAndBigRegion.isVisible = true
             binding.onlyBigRegion.isVisible = false
@@ -99,8 +110,29 @@ class FilterPlaceOfWorkFragment : Fragment() {
         }
     }
 
+    private fun activateClearIcon(filter: Filter): Boolean {
+        return when {
+            filter.areaCountry != null && filter.areaCity != null -> false
+            else -> true
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Обновляем данные при каждом появлении фрагмента
+        viewModel.loadData()
+        viewModel.getFilterLiveData().observe(viewLifecycleOwner) { filter ->
+            selectFilter = filter
+            viewModel.applyCountryIfEmptyByRegionId(filter)
+            binding.buttonImageCountry.isClickable = activateClearIcon(filter)
+            showCountry(filter.areaCountry)
+            showCity(filter.areaCity)
+            binding.btnSelectPlaceOfWork.isVisible = filter.areaCountry != null || filter.areaCity != null
+        }
     }
 }

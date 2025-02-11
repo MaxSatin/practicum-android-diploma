@@ -15,6 +15,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,6 +43,8 @@ class SearchFragment : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
     private var job: Job? = null
     private var textInput: String = ""
+    private var isLoading = false
+    private var isFromTopBar = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
@@ -55,6 +59,11 @@ class SearchFragment : Fragment() {
         super.onDestroyView()
     }
 
+    override fun onResume() {
+        super.onResume()
+        checkAndUpdateIfFilterChanged()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupNavigation()
@@ -62,6 +71,21 @@ class SearchFragment : Fragment() {
         setupTextInput()
         setupClearIcon()
         observeViewModel()
+        isFromTopBarListener()
+    }
+
+    private fun checkAndUpdateIfFilterChanged() {
+        if (isFromTopBar) {
+            isFromTopBar = false
+        } else {
+            viewModel.refreshUpdatedFilter()
+            val filter = viewModel.currentFilter.value
+            val updatedFilter = viewModel.updatedFilter.value
+            if (filter != updatedFilter) {
+                adapter?.clearData()
+                viewModel.searchOnAppliedFilter(textInput)
+            }
+        }
     }
 
     private fun setupNavigation() {
@@ -86,10 +110,12 @@ class SearchFragment : Fragment() {
                     val itemsCount = adapter!!.itemCount - 1
                     Log.d("OnScroll", "pos: $pos, itemsCount: $itemsCount")
                     if (pos >= itemsCount) {
-                        handler.postDelayed(
-                            { loadNextPage() },
-                            DELAY_500
-                        )
+                        isLoading = true
+                        lifecycleScope.launch {
+                            loadNextPage()
+                            delay(DELAY_2000)
+                            isLoading = false
+                        }
                     }
                 }
             }
@@ -100,9 +126,33 @@ class SearchFragment : Fragment() {
         viewModel.renderFilterState()
         binding.textInput.requestFocus()
         binding.textInput.setOnEditorActionListener { _, actionId, _ -> if (actionId == EditorInfo.IME_ACTION_DONE) {
-            viewModel.searchVacancy(
-                binding.textInput.text.toString()
-            ).let { true }
+            var checkError = false
+            viewModel.observeState().observe(viewLifecycleOwner) {
+                when (it) {
+                    SearchViewState.ConnectionError, SearchViewState.ServerError -> {
+                        checkError = true
+                    }
+                    else -> {
+                        checkError = false
+                    }
+                }
+            }
+
+            if (checkError) {
+                viewModel.searchVacancy(
+                    binding.textInput.text.toString()
+                )
+            } else {
+                viewModel.searchDebounce(
+                    binding.textInput.text.toString()
+                )
+            }
+
+            (requireContext().getSystemService(
+                Context.INPUT_METHOD_SERVICE
+            ) as? InputMethodManager)?.hideSoftInputFromWindow(view?.windowToken, 0)
+                .let { true }
+
         } else {
             false
         } }
@@ -118,7 +168,7 @@ class SearchFragment : Fragment() {
                 if (s.isNullOrEmpty()) {
                     binding.clearIcon.visibility = View.GONE
                     viewModel.clearSearchList()
-                    adapter?.submitList(emptyList())
+                    adapter?.clearData()
                     binding.searchVacanciesRV.adapter = adapter
                 } else { binding.clearIcon.visibility = View.VISIBLE }
                 binding.searchIcon.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
@@ -142,7 +192,10 @@ class SearchFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.observeState().observe(viewLifecycleOwner) { render(it) }
+        viewModel.observeState().observe(viewLifecycleOwner) {
+            Log.d("SearchFragmentState", "$it")
+            render(it)
+        }
         viewModel.getAdapterStateLiveData().observe(viewLifecycleOwner) { renderAdapterState(it) }
         viewModel.showVacancyDetails.observe(
             viewLifecycleOwner
@@ -177,21 +230,22 @@ class SearchFragment : Fragment() {
 
     private fun showNoConnectionPH() {
         when {
-            adapter?.currentList.isNullOrEmpty() -> showMainNoConnectionPH()
+            adapter?.getCurrentList().isNullOrEmpty() -> showMainNoConnectionPH()
             job?.isActive != true -> showPaginationNoConnectionPH()
         }
     }
 
     private fun showNoVacanciesFoundPH() {
         when {
-            adapter?.currentList.isNullOrEmpty() -> showMainNoVacanciesFoundPH()
+            adapter?.getCurrentList().isNullOrEmpty() -> showMainNoVacanciesFoundPH()
             job?.isActive != true -> showPaginationNoVacanciesPH()
         }
     }
 
     private fun showServerErrorPH() {
+        Log.d("SearchFragmentServerError", "Method called")
         when {
-            adapter?.currentList.isNullOrEmpty() -> showMainServerErrorPH()
+            adapter?.getCurrentList().isNullOrEmpty() -> showMainServerErrorPH()
             job?.isActive != true -> showPaginationServerErrorPH()
         }
     }
@@ -252,7 +306,7 @@ class SearchFragment : Fragment() {
         serverErrorPH.isVisible = false
     }
 
-    private fun hideAdapterLoading() = handler.postDelayed({ adapter?.hideLoading() }, DELAY_1000)
+    private fun hideAdapterLoading() = adapter?.hideLoading()
 
     private fun loadNextPage() = viewModel.onLastItemReached(textInput)
 
@@ -262,13 +316,13 @@ class SearchFragment : Fragment() {
         noVacanciesFoundPH.isVisible = false
         serverErrorPH.isVisible = false
         viewModel.searchDebounce(query)
-        adapter?.submitList(emptyList())
+        adapter?.clearData()
     }
 
     private fun onClearIconPressed() = with(binding) {
         viewModel.declineLastSearch()
         textInput.setText("")
-        adapter?.submitList(emptyList())
+        adapter?.clearData()
         initScreenPH.isVisible = true
         searchVacanciesRV.adapter = adapter
         searchVacanciesRV.isVisible = false
@@ -280,6 +334,7 @@ class SearchFragment : Fragment() {
 
     private fun showContent(state: SearchViewState.Content) = with(binding) {
         job?.cancel()
+        adapter?.hideLoading()
         adapter?.submitData(state.listItem)
         textHint.text = state.vacanciesFoundHint
         textHint.isVisible = true
@@ -291,7 +346,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun showVacancyDetails(vacancyId: String) = findNavController()
-        .navigate(R.id.action_searchFragment_to_vacancyFragment, VacancyFragment.createArgs(vacancyId))
+        .navigate(R.id.action_searchFragment_to_vacancyFragment, VacancyFragment.createArgs(vacancyId, false))
 
     private fun launchJob(message: String) {
         job = CoroutineScope(Dispatchers.Main).launch {
@@ -301,14 +356,20 @@ class SearchFragment : Fragment() {
         }
     }
 
+    private fun isFromTopBarListener() {
+        setFragmentResultListener(TOP_BAR_BUTTON_CLICKED) { _, bundle ->
+            isFromTopBar = bundle.getBoolean(IS_FROM_TOP_BAR, false)
+        }
+    }
+
     companion object {
+        private const val IS_FROM_TOP_BAR = "isFromTopBar"
+        private const val TOP_BAR_BUTTON_CLICKED = "topBarButtonClicked"
         private const val FIRST_ITEM_MARGIN_TOP = 46
         private const val DELAY_2000 = 2_000L
-        private const val DELAY_1000 = 1_000L
-        private const val DELAY_500 = 500L
         private const val NO_VACANCIES_FOUND = "Таких вакансий нет"
         private const val ERROR_NO_VACANCIES_FOUND = "Ошибка. Вакансии не найдены"
-        private const val CHECK_YOUR_CONNECTION = "Проверьте подключение"
+        private const val CHECK_YOUR_CONNECTION = "Проверьте подключение к интернету"
         private const val SERVER_ERROR = "Ошибка сервера"
     }
 }

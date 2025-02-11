@@ -23,7 +23,7 @@ class SearchViewModel(
     private val sharedPrefsInteractor: SharedPrefsInteractor,
 ) : ViewModel() {
 
-    private var currentPage: Int = 1
+    private var currentPage: Int = 0
     private var maxPages: Int? = 0
     private var latestSearchQuery: String? = null
     private var vacancyList = mutableListOf<ListItem>()
@@ -60,6 +60,25 @@ class SearchViewModel(
     private val adapterStateLiveData = MutableLiveData<AdapterState>()
     fun getAdapterStateLiveData(): LiveData<AdapterState> = adapterStateLiveData
 
+    private val _currentFilter = MutableLiveData<Filter>()
+    val currentFilter: LiveData<Filter> get() = _currentFilter
+
+    private val _updatedFilter = MutableLiveData<Filter>()
+    val updatedFilter: LiveData<Filter> get() = _updatedFilter
+
+    init {
+        _currentFilter.value = sharedPrefsInteractor.getFilter()
+    }
+
+    fun refreshCurrentFilter() {
+        _currentFilter.value = sharedPrefsInteractor.getFilter()
+    }
+
+    fun refreshUpdatedFilter() {
+        val updatedFilter = sharedPrefsInteractor.getFilter()
+        _updatedFilter.value = updatedFilter
+    }
+
     fun searchDebounce(changedText: String) {
         if (latestSearchQuery == changedText) {
             return
@@ -78,6 +97,9 @@ class SearchViewModel(
     }
 
     fun searchVacancy(searchQuery: String) {
+        currentPage = 0
+        Log.d("CurrentPage", "$currentPage maxpages: $maxPages")
+        refreshCurrentFilter()
         if (searchQuery.isNotEmpty()) {
             Log.d("SearchQuery", "$searchQuery")
             if (!isNextPageLoading) {
@@ -105,13 +127,12 @@ class SearchViewModel(
             return
         } else if (query.isNotEmpty()) {
             if (!isNextPageLoading) {
-                currentPage += 1
                 job = viewModelScope.launch {
                     try {
                         isNextPageLoading = true
                         renderAdapterState(AdapterState.IsLoading)
                         searchInteractor
-                            .searchVacancy(query, currentPage - 1)
+                            .searchVacancy(query, currentPage)
                             .collect { viewState ->
                                 renderScreenState(viewState)
                                 isNextPageLoading = false
@@ -119,9 +140,8 @@ class SearchViewModel(
                     } finally {
                         isNextPageLoading = false
                     }
-                    Log.d("CurrentPage", "$currentPage")
+                    Log.d("CurrentPage", "$currentPage maxpages: $maxPages")
                     renderAdapterState(AdapterState.Idle)
-
                 }
             }
         }
@@ -159,6 +179,16 @@ class SearchViewModel(
         }
     }
 
+    fun searchOnAppliedFilter(lastSearchedQuery: String) {
+        val filter = sharedPrefsInteractor.getFilter()
+        val lastSearchedText = this.latestSearchQuery
+        if (!checkFilterFieldsAreNull(filter) || filter.withSalary == true) {
+            searchVacancy(lastSearchedQuery)
+        } else if (lastSearchedText != null) {
+            searchVacancy(lastSearchedText)
+        }
+    }
+
     private fun checkFilterFieldsAreNull(filter: Filter): Boolean {
         return with(filter) {
             areaCountry == null && areaCity == null && industrySP == null && salary == null
@@ -179,6 +209,7 @@ class SearchViewModel(
                     makeFoundVacanciesHint(state.vacancyList.found)
                 )
             )
+            currentPage += 1
         } else {
             stateLiveData.postValue(state)
         }
