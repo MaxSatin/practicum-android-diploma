@@ -17,11 +17,7 @@
 <img width="325" height="433" alt="Image" src="https://github.com/user-attachments/assets/bc81b98f-a3a8-4108-a6ae-765500deaf92" />
 
 ## Screencasts ## 
-![Image](https://github.com/user-attachments/assets/3c7f34d3-a83d-430d-aff9-51a2c73b5dfe)
-
-![Image](https://github.com/user-attachments/assets/69306f10-8dc5-479a-94d3-eda5f8bc950e)
-
-![Image](https://github.com/user-attachments/assets/9a46cc82-42d3-4271-8fca-e6a0e267a016)
+![Image](https://github.com/user-attachments/assets/3c7f34d3-a83d-430d-aff9-51a2c73b5dfe)![Image](https://github.com/user-attachments/assets/69306f10-8dc5-479a-94d3-eda5f8bc950e)![Image](https://github.com/user-attachments/assets/9a46cc82-42d3-4271-8fca-e6a0e267a016)
 
 
 ## Цель проекта
